@@ -19,6 +19,8 @@ function optionChanged(selectID) {
 function plotPlots(selectID) {
     d3.json("../../Data/samples.json").then((data) => {
         var filteredData = data.samples.filter((sample) => sample.id==selectID)[0];
+        var value = (filteredData.sample_values.reduce((a,b)=> a+b)/filteredData.sample_values.length)/10;
+        console.log(value);
         
         traceBar = {
             x: filteredData.sample_values.slice(0,10).reverse(),
@@ -38,10 +40,41 @@ function plotPlots(selectID) {
             marker: {
                 colorscale: "Earth",
                 color: filteredData.otu_ids,
-                size: filteredData.sample_values.map((sample) => sample/2)
+                size: filteredData.sample_values.map((sample) => sample/1.5)
             }
         }
         Plotly.newPlot("bubble", [traceBubble])
+        var traceGuage = [
+            {
+              domain: { x: [0, 1], y: [0, 1] },
+              value: value,
+              title: { text: "Belly Button Washing Frequency" },
+              type: "indicator",
+              mode: "gauge+number",
+              delta: { reference: 380 },
+              gauge: {
+                axis: { range: [null, 10] },
+                steps: [
+                  { range: [0, 1], color: "darkgreen" },
+                  { range: [1, 2], color: "lightgreen" },
+                  { range: [2, 3], color: "lightgreen" },
+                  { range: [3, 4], color: "yellow" },
+                  { range: [4, 5], color: "yellow" },
+                  { range: [5, 6], color: "yellow" },
+                  { range: [6, 7], color: "yellow" },
+                  { range: [7, 8], color: "red" },
+                  { range: [8, 9], color: "red" },
+                  { range: [9, 10], color: "darkred" }
+                ],
+              }
+            }
+          ];
+        var layout = {
+            width: 600, 
+            height: 450, 
+            margin: { t: 0, b: 0 }
+        };
+        Plotly.newPlot("gauge", traceGuage, layout);
     })
 };
 
